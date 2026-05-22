@@ -1,0 +1,28 @@
+name: Daily Job Finder
+
+on:
+  schedule:
+    - cron: '0 13 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  find-jobs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install groq openpyxl requests
+      - name: Run job finder
+        env:
+          RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        run: python job_finder.py
+      - uses: actions/upload-artifact@v3
+        with:
+          name: job-results
+          path: |
+            *.xlsx
+            *.html
